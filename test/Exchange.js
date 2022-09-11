@@ -20,7 +20,7 @@ describe("Exchange", () => {
         const Token = await ethers.getContractFactory('Token');
 
         token1 = await Token.deploy('Gil Token', 'GIL', '1000000');
-        token2 = await Token.deploy('Johnny Bravo Token', 'JBT', '10000000');
+        token2 = await Token.deploy('Johnny Bravo Token', 'JBT', '1000000');
 
         accounts = await hre.ethers.getSigners();
         deployer = accounts[0];
@@ -154,16 +154,64 @@ describe("Exchange", () => {
         let amount = tokens(1);
 
         beforeEach( async () => {
-            //Approve token
-            transaction = await token1.connect(user1).approve(exchange.address, amount);
-            result = await transaction.wait();
-            //Deposit token
-            transaction = await exchange.connect(user1).depositToken(token1.address, amount);
-            result = await transaction.wait();
+                //Approve token
+                transaction = await token1.connect(user1).approve(exchange.address, amount);
+                result = await transaction.wait();
+                //Deposit token
+                transaction = await exchange.connect(user1).depositToken(token1.address, amount);
+                result = await transaction.wait();
         });
 
         it('returns user balance', async () => {
             expect (await exchange.balanceOf(token1.address, user1.address)).to.equal(amount);
+        });
+
+    });
+
+    describe('Making Orders', async () => {
+        let transaction;
+        let result;
+        let amount = tokens(1);
+
+        describe('Success', async () => {
+            beforeEach( async () => {
+                //Deposit tokens before making the order
+                
+                //Approve token
+                transaction = await token1.connect(user1).approve(exchange.address, amount);
+                result = await transaction.wait();
+                //Deposit token
+                transaction = await exchange.connect(user1).depositToken(token1.address, amount);
+                result = await transaction.wait();
+                //Make order
+                transaction = await exchange.connect(user1).makeOrder(token2.address, amount, token1.address, amount);
+                result = await transaction.wait();
+            });
+
+            it('Tracks the newly created order', async () => {
+                expect(await exchange.ordersCount()).to.equal(1);
+            });
+
+            it('emits an Order event', async () => {
+                const event = result.events[0];
+                expect(event.event).to.equal('Order');
+
+                const args = event.args;
+                expect(args.id).to.equal(1);
+                expect(args.user).to.equal(user1.address);
+                expect(args.tokenGet).to.equal(token2.address);
+                expect(args.amountGet).to.equal(tokens(1));
+                expect(args.tokenGive).to.equal(token1.address);
+                expect(args.amountGive).to.equal(tokens(1));
+                expect(args.timestamp).to.at.least(1);
+            });
+
+        });
+
+        describe('Failure', async () => {
+            it('Rejects when user has no sufficient balance', async () => {
+                await expect(exchange.connect(user1).makeOrder(token1.address, tokens(1), token2.address, tokens(1))).to.be.reverted;
+            });
         });
 
     });
