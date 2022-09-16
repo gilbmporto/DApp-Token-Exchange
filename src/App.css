@@ -371,6 +371,12 @@ small {
 	margin: 0 0.5em 0 0;
 }
 
+.token {
+	width: 20px;
+	height: auto;
+	margin: 0 0.5em 0 0;
+}
+
 .identicon {
 	margin: 0 0 0 0.60em;
 }
