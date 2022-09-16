@@ -3,7 +3,10 @@ import { useDispatch } from 'react-redux';
 import config from '../config.json';
 import '../App.css';
 
-import { loadProvider, loadNetwork, loadAccount, loadToken } from '../store/interactions.js'
+import { loadProvider, loadNetwork, loadAccount, loadTokens, loadExchange } from '../store/interactions.js'
+
+import Navbar from './Navbar';
+import Markets from './Markets';
 
 
 function App() {
@@ -11,14 +14,33 @@ function App() {
   const dispatch = useDispatch();
 
   const loadBlockchainData = async () => {
-    await loadAccount(dispatch);
-
     //Connect Ethers to blockchain
     const provider = loadProvider(dispatch);
+
+    //Fetch current network's chainId (e.g. hardhat: 31337, kovan: 42)
     const chainId = await loadNetwork(provider, dispatch);
 
-    // Token Smart Contract
-    await loadToken(provider, config[chainId].GilT.address, dispatch);
+    //Reload page when network changes
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    })
+
+    //Fetch current account & balance from Metamask when account is changed
+    window.ethereum.on('accountsChanged', () => {
+      loadAccount(provider, dispatch);
+    })
+
+    // Fetch current account & balance from Metamask
+    //await loadAccount(provider, dispatch);
+
+    // Load token smart contracts
+    const GilT = config[chainId].GilT;
+    const JbtT = config[chainId].JbtT;
+    await loadTokens(provider, [GilT.address, JbtT.address], dispatch);
+
+    //Load exchange smart contract
+    const exchangeConfig = config[chainId].exchange;
+    await loadExchange(provider, exchangeConfig.address, dispatch);
     
   };
 
@@ -29,12 +51,12 @@ function App() {
   return (
     <div>
 
-      {/* Navbar */}
+      <Navbar />
 
       <main className='exchange grid'>
         <section className='exchange__section--left grid'>
 
-          {/* Markets */}
+          <Markets />
 
           {/* Balance */}
 
