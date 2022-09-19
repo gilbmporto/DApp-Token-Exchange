@@ -3,12 +3,18 @@ import { useDispatch } from 'react-redux';
 import config from '../config.json';
 import '../App.css';
 
-import { loadProvider, loadNetwork, loadAccount, loadTokens, loadExchange, subscribeToEvents } from '../store/interactions.js'
+import { loadProvider, loadNetwork, loadAccount, loadTokens, loadExchange, subscribeToEvents, loadAllOrders } from '../store/interactions.js'
 
 import Navbar from './Navbar';
 import Markets from './Markets';
 import Balance from './Balance';
+import Order from './Order';
+import PriceChart from './PriceChart';
+import Trades from './Trades';
+import OrderBook from './OrderBook';
 
+// npx hardhat run --network localhost scripts/1_deploy.js
+// npx hardhat run --network localhost scripts/2_seed-exchange.js
 
 function App() {
 
@@ -43,6 +49,9 @@ function App() {
     const exchangeConfig = config[chainId].exchange;
     const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
 
+    //Fetch all orders: open, filled, cancelled
+    loadAllOrders(provider, exchange, dispatch);
+
     //Listen to events
     subscribeToEvents(exchange, dispatch);
   };
@@ -63,18 +72,18 @@ function App() {
 
           <Balance />
 
-          {/* Order */}
+          <Order />
 
         </section>
         <section className='exchange__section--right grid'>
 
-          {/* PriceChart */}
+          <PriceChart />
 
           {/* Transactions */}
 
-          {/* Trades */}
+          <Trades />
 
-          {/* OrderBook */}
+          <OrderBook />
 
         </section>
       </main>

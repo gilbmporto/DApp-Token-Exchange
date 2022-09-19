@@ -87,9 +87,9 @@ contract Exchange {
         orders[ordersCount] = _Order(
             ordersCount, 
             msg.sender, //user '0x0...abc123'
-            _tokenGet, //tokenGet
+            _tokenGet, //Token that will be bought
             _amountGet, //Amount of token that will be bought
-            _tokenGive, //token that will be given
+            _tokenGive, //Token that will be given
             _amountGive, //Amount of token that will be given
             block.timestamp //timestamp
             );

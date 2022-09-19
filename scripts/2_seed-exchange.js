@@ -131,13 +131,15 @@ async function main() {
     result = await transaction.wait();
     console.log(`Filled order from ${user1.address}\n`);
 
+    
     // Wait 1 second
     await wait(1);
+    
 
     ////////////////////////////////
     // Seed Open Orders
     //
-
+    
     // User 10 makes orders
     for (let i = 1; i <= 10; i++) {
         transaction = await exchange.connect(user1).makeOrder(JbtT.address, tokens(10 * i), GilT.address, tokens(10));
