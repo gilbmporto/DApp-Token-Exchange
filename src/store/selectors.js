@@ -243,6 +243,8 @@ export const orderBookSelector = createSelector(
     // Filter orders by selected tokens
     orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address)
     orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address)
+    console.log(orders);
+    console.log(orders[0]);
 
     // Decorate orders
     orders = decorateOrderBookOrders(orders, tokens)
