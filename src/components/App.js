@@ -13,6 +13,7 @@ import PriceChart from './PriceChart';
 import Transactions from './Transactions';
 import Trades from './Trades';
 import OrderBook from './OrderBook';
+import Alert from './Alert';
 
 // npx hardhat run --network localhost scripts/1_deploy.js
 // npx hardhat run --network localhost scripts/2_seed-exchange.js
@@ -89,7 +90,7 @@ function App() {
         </section>
       </main>
 
-      {/* Alert */}
+      <Alert />
 
     </div>
   );
